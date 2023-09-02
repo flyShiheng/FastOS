@@ -4,8 +4,12 @@ boot_start:
     call set_print_real_mode_cursor
     mov bx, MSG_BOOT_START
     call print_real_string
+
+    call switch_protecd_mode
     jmp $
 
 %include "boot/boot_print.asm"
+%include "boot/boot_gdt.asm"
+%include "boot/boot_protect.asm"
 
-MSG_BOOT_START db "BOOT START", 0
+MSG_BOOT_START db "Boot Start", 0

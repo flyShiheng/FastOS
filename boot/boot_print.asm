@@ -49,3 +49,20 @@ set_print_real_mode_cursor:
     int 0x10
     popa
     ret
+
+[bits 32]
+print_pm:
+    pusha
+    mov edx, 0xb8000
+print_pm_start:
+    mov al, [ebx]
+    mov ah, 0x0f  ; the color byte for each character
+    cmp al, 0
+    je print_pm_done
+    mov [edx], ax  ; the show char
+    add ebx, 1
+    add edx, 2
+    jmp print_pm_start
+print_pm_done:
+    popa
+    ret
