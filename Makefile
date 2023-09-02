@@ -1,7 +1,7 @@
 
 all: os-image.bin
 
-os-image.bin: boot/bootsect.bin
+os-image.bin: boot/boot_sect.bin
 	cat $^ > $@
 
 run: all
