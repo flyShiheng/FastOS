@@ -1,0 +1,4 @@
+
+make run
+
+make clean
