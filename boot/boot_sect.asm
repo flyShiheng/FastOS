@@ -12,6 +12,7 @@ start:
     call set_print_real_mode_cursor
     mov bx, MSG_LOAD_DISK_SUCCESS
     call print_real_string
+    call kERNEL_OFFSET
     jmp $
 
 [bits 16]
