@@ -5,11 +5,11 @@ boot_start:
     mov bx, MSG_BOOT_START
     call print_real_string
 
-    call switch_protecd_mode
+    call switch_long_mode
     jmp $
 
 %include "boot/boot_print.asm"
 %include "boot/boot_gdt.asm"
-%include "boot/boot_protect.asm"
+%include "boot/boot_long.asm"
 
 MSG_BOOT_START db "Boot Start", 0
