@@ -20,7 +20,7 @@ void idt_set_descriptor(uint8_t vector, uintptr_t isr, uint8_t flags, uint8_t is
     descriptor->rsv0           = 0;
 }
 
-void idt_assemble() {
+void idt_init() {
     idtr.base = (uintptr_t)&__idt[0];
     idtr.limit = (uint16_t)sizeof(idt_desc_t) * IDT_MAX_DESCRIPTORS - 1;
 
@@ -28,14 +28,11 @@ void idt_assemble() {
         idt_set_descriptor(vector, isr_handler, IDT_DESCRIPTOR_EXCEPTION, 0);
     }
 
-    vga_print(" idt_assemble ", TEXT_WHITE);
-
-    // __asm__("lidt %0" : : "m" (idtr));we         
     idt_reload(&idtr);
     __asm__ volatile ("sti");
 }
 
 void isr_handler() {
-    vga_print("Soft Interrupt message", TEXT_RED);
+    vga_print("Soft Interrupt message", TEXT_WHITE);
     __asm__ volatile ("cli; hlt");
 }

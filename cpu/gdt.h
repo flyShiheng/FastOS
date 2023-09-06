@@ -52,4 +52,4 @@ typedef struct {
 
 void        gdt_add_descriptor(uint64_t base, uint16_t limit, uint8_t access, uint8_t granularity);
 void        gdt_reload(gdtr_t* gdtr, uint16_t code, uint16_t data);
-void        gdt_assemble(void);
+void        gdt_init(void);

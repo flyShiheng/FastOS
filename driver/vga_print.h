@@ -1,5 +1,4 @@
-#ifndef KERNEL_KPRINT_H
-#define KERNEL_KPRINT_H
+#pragma once
 
 #include "../driver/port.h"
 
@@ -35,5 +34,3 @@ void vga_screen_clear();
 int vga_print(const char* str, int color);
 
 void vga_print_at(const char c, int fore_color, int back_color, int x, int y);
-
-#endif  // KERNEL_KPRINT_H

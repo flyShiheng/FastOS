@@ -1,4 +1,4 @@
-C_SOURCES = $(wildcard kernel/*.c driver/*.c interrupt/*.c)
+C_SOURCES = $(wildcard kernel/*.c driver/*.c cpu/*.c)
 
 OBJ = ${C_SOURCES:.c=.o} 
 
@@ -9,14 +9,15 @@ all: os-image.bin
 os-image.bin: boot/boot_sect.bin kernel.bin
 	cat $^ > $@
  
-kernel.bin: boot/boot_kernel.o interrupt/gdt_load.o interrupt/idt_load.o ${OBJ}
+kernel.bin: boot/boot_kernel.o cpu/gdt_load.o cpu/idt_load.o ${OBJ}
 	ld -Ttext 0x1000 $^ -o $@ --oformat binary
 
-kernel.elf: boot/boot_kernel.o interrupt/gdt_load.o interrupt/idt_load.o ${OBJ}
+kernel.elf: boot/boot_kernel.o cpu/gdt_load.o cpu/idt_load.o ${OBJ}
 	ld -Ttext 0x1000 $^ -o $@
 
 run: all
-	qemu-system-x86_64 -fda os-image.bin # -d guest_errors,int
+	qemu-system-x86_64 -fda os-image.bin --nographic # -d guest_errors,int
+	# -curses -monitor stdio # --nographic
 
 debug: os-image.bin kernel.elf
 	qemu-system-x86_64 -s -S -fda os-image.bin -d guest_errors,int &
@@ -32,4 +33,4 @@ debug: os-image.bin kernel.elf
 	nasm $< -f bin -o $@
 
 clean:
-	rm -rf os-image.bin kernel.bin kernel.elf boot/*.o boot/*.bin kernel/*.o driver/*.o interrupt/*.o
+	rm -rf os-image.bin kernel.bin kernel.elf boot/*.o boot/*.bin kernel/*.o driver/*.o cpu/*.o

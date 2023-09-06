@@ -6,7 +6,7 @@ static gdtr_t gdtr;
 
 static uint16_t gindex;
 
-void gdt_assemble() {
+void gdt_init() {
     gdtr.limit = (sizeof(gdt_desc_t) * GDT_MAX_DESCRIPTORS) - 1;
     gdtr.base = (uintptr_t)&__gdt[0];
 
