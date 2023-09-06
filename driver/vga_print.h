@@ -1,5 +1,4 @@
-#ifndef KERNEL_KPRINT_H
-#define KERNEL_KPRINT_H
+#pragma once
 
 #include "../driver/port.h"
 
@@ -28,12 +27,10 @@
 
 #define vga_video_memory (char*) 0xb8000
 
-void kprint_init();
+void vga_print_init();
 
-void screen_clear();
+void vga_screen_clear();
 
-int kprint(const char* str, int color);
+int vga_print(const char* str, int color);
 
-void kprint_at(const char c, int fore_color, int back_color, int x, int y);
-
-#endif  // KERNEL_KPRINT_H
+void vga_print_at(const char c, int fore_color, int back_color, int x, int y);

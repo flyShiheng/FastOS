@@ -36,6 +36,7 @@ DATA_SEG equ gdt_data - gdt_start
 
 
 ; GDP in Long Mode 
+global  GDT_start
 GDT_start:
     dq 0x0000000000000000              ; Null Descriptor - should be present.
 GDT_code:
@@ -50,3 +51,15 @@ GDT_descriptor:
 
 LONG_CODE_SEG equ GDT_code - GDT_start
 LONG_DATA_SEG equ GDT_data - GDT_start
+
+; IDT
+global IDT_table
+global IDT_descriptor
+IDT_table:
+    times 512 db 0
+IDT_descriptor:
+    dw $ - IDT_table - 1
+    dd IDT_table
+
+; global IDT_KERNEL_CS
+; IDT_KERNEL_CS equ IDT_table - GDT_start
