@@ -3,9 +3,9 @@
 %define PAGE_PRESENT    (1 << 0)
 %define PAGE_WRITE      (1 << 1)
 
-IDT:
-    .Length dw 0
-    .Base   dd 0
+; IDT:
+;     .Length dw 0
+;     .Base   dd 0
 
 switch_long_mode:
     xor ax, ax
@@ -65,7 +65,7 @@ LoopPageTable:
     nop
     nop
     lgdt [GDT_descriptor]                  ; Load GDT.Pointer defined below.
-    lidt [IDT]                        ; Load a zero length IDT so that any NMI causes a triple fault.
+    lidt [IDT_descriptor]                        ; Load a zero length IDT so that any NMI causes a triple fault.
 
     ; Enter long mode.
     mov eax, 10100000b                ; Set the PAE and PGE bit.
