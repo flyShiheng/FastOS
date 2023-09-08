@@ -2,6 +2,8 @@ C_SOURCES = $(wildcard kernel/*.c driver/*.c cpu/*.c)
 
 OBJ = ${C_SOURCES:.c=.o} 
 
+ASM_OBJ= boot/boot_kernel.o cpu/gdt_load.o cpu/isr.o
+
 CFLAGS= -g -fno-builtin -fno-stack-protector #  -nostdinc
 
 all: os-image.bin
@@ -9,10 +11,10 @@ all: os-image.bin
 os-image.bin: boot/boot_sect.bin kernel.bin
 	cat $^ > $@
  
-kernel.bin: boot/boot_kernel.o cpu/gdt_load.o cpu/idt_load.o ${OBJ}
+kernel.bin: ${ASM_OBJ} ${OBJ}
 	ld -Ttext 0x1000 $^ -o $@ --oformat binary
 
-kernel.elf: boot/boot_kernel.o cpu/gdt_load.o cpu/idt_load.o ${OBJ}
+kernel.elf: ${ASM_OBJ} ${OBJ}
 	ld -Ttext 0x1000 $^ -o $@
 
 run: all
