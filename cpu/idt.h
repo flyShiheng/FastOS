@@ -36,18 +36,22 @@ typedef struct {
 typedef struct {
     // auto push by cpu  rip cs rflags rsp dss
     struct {
-        uint64_t    vector;
-        uint64_t    error_code;
-        uint64_t    rip;     // 下一条指令地址 
-        uint64_t    cs;      // 代码段寄存器
-        uint64_t    rflags;  // 标志寄存器 存储与CPU状态相关的标志
-        uint64_t    rsp;
-        uint64_t    dss;     // 数据段寄存器
+        uint64_t    vector;      // 中断向量号
+        uint64_t    error_code;  // 错误码
+        uint64_t    rip;         // 下一条指令地址 
+        uint64_t    cs;          // 代码段寄存器
+        uint64_t    rflags;      // 标志寄存器 存储与CPU状态相关的标志
+        uint64_t    rsp;         // 栈
+        uint64_t    dss;         // 数据段寄存器
     } base_frame;
 } isr_frame_t;
 
 void  idt_reload(idtr_t* idtr);
+
 void  idt_set_descriptor(uint8_t vector, uint64_t isr, uint8_t flags, uint8_t ist);
+
 void  idt_init(void);
 
-void isr_handler();
+void isr_handler(isr_frame_t frame);
+
+void print_frame(isr_frame_t* frame);

@@ -4,7 +4,7 @@
 #include "../driver/uart.h"
 
 void kernel_main() {
-    
+
     uart_init();
 
     gdt_init();
@@ -12,9 +12,9 @@ void kernel_main() {
     idt_init();
 
     printk("\n\n");
-    printk("Hello FastOS! This is uart... \n");
 
-    printk("Fast OS%x \n", 100);
+    printk("Hello Fast OS%x \n", 100);
 
     int a = 1 / 0;
+    // __asm__ volatile ("int3");
 }
