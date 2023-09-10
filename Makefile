@@ -10,7 +10,7 @@ all: os-image.bin
 
 os-image.bin: boot/boot_sect.bin kernel.bin
 	cat $^ > $@
- 
+
 kernel.bin: ${ASM_OBJ} ${OBJ}
 	ld -Ttext 0x1000 $^ -o $@ --oformat binary
 
@@ -19,7 +19,6 @@ kernel.elf: ${ASM_OBJ} ${OBJ}
 
 run: all
 	qemu-system-x86_64 -fda os-image.bin --nographic # -d guest_errors,int
-	# -curses -monitor stdio # --nographic
 
 debug: os-image.bin kernel.elf
 	qemu-system-x86_64 -s -S -fda os-image.bin -d guest_errors,int &
