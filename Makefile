@@ -1,4 +1,4 @@
-C_SOURCES = $(wildcard kernel/*.c driver/*.c cpu/*.c)
+C_SOURCES = $(wildcard kernel/*.c driver/*.c cpu/*.c mem/*.c)
 
 OBJ = ${C_SOURCES:.c=.o} 
 
@@ -34,4 +34,4 @@ debug: os-image.bin kernel.elf
 	nasm $< -f bin -o $@
 
 clean:
-	rm -rf os-image.bin kernel.bin kernel.elf boot/*.o boot/*.bin kernel/*.o driver/*.o cpu/*.o
+	rm -rf os-image.bin kernel.bin kernel.elf boot/*.o boot/*.bin kernel/*.o driver/*.o cpu/*.o mem/*.o

@@ -62,7 +62,7 @@ void idt_set_descriptor(uint8_t vector, uint64_t isr, uint8_t flags, uint8_t ist
 }
 
 void idt_init() {
-    kidtr.base = (uint64_t)&kidt[0];
+    kidtr.base  = (uint64_t)&kidt[0];
     kidtr.limit = (uint16_t)sizeof(idt_desc_t) * IDT_MAX_DESCRIPTORS - 1;
 
     for (uint8_t vector = 0; vector < IDT_CPU_EXCEPTION_COUNT; vector++) {
