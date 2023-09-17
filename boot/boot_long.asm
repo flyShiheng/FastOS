@@ -1,11 +1,7 @@
-%define FREE_SPACE 0x9000
+%define FREE_SPACE 0xA000
 [bits 16]
-%define PAGE_PRESENT    (1 << 0)
-%define PAGE_WRITE      (1 << 1)
-
-; IDT:
-;     .Length dw 0
-;     .Base   dd 0
+%define LM_PAGE_PRESENT    (1 << 0)
+%define LM_PAGE_WRITE      (1 << 1)
 
 switch_long_mode:
     xor ax, ax
@@ -22,50 +18,45 @@ switch_long_mode:
     call switch_long_mode_start
 
 switch_long_mode_start:
-    push di                           ; REP STOSD alters DI.
+    push di
     mov ecx, 0x1000
     xor eax, eax
     cld
     rep stosd
-    pop di                            ; Get DI back.
+    pop di
 
-    ; Build the Page Map Level 4.
-    ; es:di points to the Page Map Level 4 table.
-    lea eax, [es:di + 0x1000]         ; Put the address of the Page Directory Pointer Table in to EAX.
-    or eax, PAGE_PRESENT | PAGE_WRITE ; Or EAX with the flags - present flag, writable flag.
-    mov [es:di], eax                  ; Store the value of EAX as the first PML4E.
+    lea eax, [es:di + 0x1000]
+    or eax, LM_PAGE_PRESENT | LM_PAGE_WRITE
+    mov [es:di], eax
 
-    ; Build the Page Directory Pointer Table.
-    lea eax, [es:di + 0x2000]         ; Put the address of the Page Directory in to EAX.
-    or eax, PAGE_PRESENT | PAGE_WRITE ; Or EAX with the flags - present flag, writable flag.
-    mov [es:di + 0x1000], eax         ; Store the value of EAX as the first PDPTE.
+    lea eax, [es:di + 0x2000]
+    or eax, LM_PAGE_PRESENT | LM_PAGE_WRITE
+    mov [es:di + 0x1000], eax
 
-    ; Build the Page Directory.
-    lea eax, [es:di + 0x3000]         ; Put the address of the Page Table in to EAX.
-    or eax, PAGE_PRESENT | PAGE_WRITE ; Or EAX with the flags - present flag, writeable flag.
-    mov [es:di + 0x2000], eax         ; Store to value of EAX as the first PDE.
+    lea eax, [es:di + 0x3000]
+    or eax, LM_PAGE_PRESENT | LM_PAGE_WRITE
+    mov [es:di + 0x2000], eax
+    push di
 
-    push di                           ; Save DI for the time being.
-    lea di, [di + 0x3000]             ; Point DI to the page table.
-    mov eax, PAGE_PRESENT | PAGE_WRITE    ; Move the flags into EAX - and point it to 0x0000.
-
-    ; Build the Page Table.
+    lea di, [di + 0x3000]
+    mov eax, LM_PAGE_PRESENT | LM_PAGE_WRITE
 LoopPageTable:
     mov [es:di], eax
     add eax, 0x1000
     add di, 8
-    cmp eax, 0x200000                 ; If we did all 2MiB, end.
+    cmp eax, 0x200000
     jb LoopPageTable
 
-    pop di                            ; Restore DI.
+
+    pop di
     ; Disable IRQs
-    mov al, 0xFF                      ; Out 0xFF to 0xA1 and 0x21 to disable all IRQs.
+    mov al, 0xFF
     out 0xA1, al
     out 0x21, al
     nop
     nop
     lgdt [GDT_descriptor]                  ; Load GDT.Pointer defined below.
-    lidt [IDT_descriptor]                        ; Load a zero length IDT so that any NMI causes a triple fault.
+    lidt [IDT_descriptor]                  ; Load a zero length IDT so that any NMI causes a triple fault.
 
     ; Enter long mode.
     mov eax, 10100000b                ; Set the PAE and PGE bit.
@@ -77,7 +68,7 @@ LoopPageTable:
     mov ecx, 0xC0000080               ; Read from the EFER MSR. 
     rdmsr    
 
-    or eax, 0x00000100                ; Set the LME bit.
+    or eax, (1 << 8)                ; Set the LME bit.
     wrmsr
 
     mov ebx, cr0                      ; Activate long mode -
