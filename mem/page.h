@@ -2,8 +2,8 @@
 #include <stdint.h>
 
 /**
- * 0 ---- 128M ---- 194M ---- 256M ---- 1G  -----
- *  system      pt       bitmap    kernel    user
+ * 0 ---- 9fc00 ---- 7e00000 ---- 7ee0000
+ *                            pt
 */
 
 /**
@@ -18,9 +18,16 @@
  * 每一级页表都有512个表项，每一个表项大小是8字节
 */
 
-#define PTE_P            0x001                                   // Present
-#define PTE_W            0x002                                   // Writable
-#define PTE_U            0x004                                   // User
+// 内存映射表项的结构
+typedef struct {
+    uint64_t address;
+    uint64_t length;
+    uint64_t type;
+} MemoryMapEntry;
+
+#define PTE_P 0x001   // Present
+#define PTE_W 0x002   // Writable
+#define PTE_U 0x004   // User
 
 typedef struct {
     uint64_t pml4;
@@ -28,10 +35,6 @@ typedef struct {
     uint64_t pml2;
     uint64_t pml1;
 } paging_indexer_t;
-
-typedef struct { 
-	uint64_t    entries[512];
-} paging_table_t;
 
 static
 __attribute__((always_inline)) 

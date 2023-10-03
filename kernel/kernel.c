@@ -8,6 +8,8 @@
 void kernel_main() {
 
     uart_init();
+    
+    printk("\n\nLoad Kernel ... \n\n");
 
     gdt_init();
 
