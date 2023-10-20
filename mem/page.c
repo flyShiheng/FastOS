@@ -1,6 +1,8 @@
 #include "./page.h"
 #include "../driver/uart.h"
 
+uint8_t* mem_bitmap = (uint8_t*)0x7ede000;
+
 void paging_indexer_assign(paging_indexer_t* indexer, void* address) {
     uint64_t uaddress = (uint64_t)address;
     uaddress >>= 12;
@@ -36,27 +38,23 @@ void mem_init2() {
     pml1_phys = get_physaddr((uint64_t)pml1);
     pml2[63] = pml1_phys | PTE_P | PTE_W;
     for (uint64_t i = 0; i < 512; i++) {
-        pml1[i] = (0x7000000 + i * 0x1000) | PTE_P | PTE_W;
+        pml1[i] = (0x7e00000 + i * 0x1000) | PTE_P | PTE_W;
     }
-
-    printk("\nmem_init2 phys pml4:%x, pml3:%x, pml2:%x, pml1:%x\n",
-        pml4_phys, pml3_phys, pml2_phys, pml1_phys);
+    // 0x7ee0000 / 0x1000 = 32480  < 4096 * 8 = 32768
     __asm__ volatile("mov %0, %%cr3" : : "a"(pml4_phys));
+
+    for (uint64_t i = 0; i < 512; i++) { 
+        set_bitmap(i * 0x1000);
+    }
+    printk("Mem Init End\n");
 }
 
 void mem_init() {
     MemoryMapEntry* mmap = (MemoryMapEntry*)0x8000;
-
-    // 遍历内存映射表
     while ((mmap->type <= 4) && (mmap->type >= 1) && (mmap->length != 0)) {
-        // printk("MemoryMapEntry address: %x\n", mmap);
-        if (mmap->type == 1) {
-            printk("Base Address: %x, Length: %x\n", mmap->address, mmap->length);
-        }
+        printk("MEM Address: %x, Length: %x, type: %d\n", mmap->address, mmap->length, mmap->type);
         mmap++;
     }
-
-    get_physaddr(0x7e00000);
 
     uint64_t* pml4 = 0x101000;  // 1M + 4k
     uint64_t* pml3 = 0x102000;
@@ -70,10 +68,11 @@ void mem_init() {
     }
     pml1 = 0x106000;
     pml2[63] = (uint64_t)pml1 | PTE_P | PTE_W;
-    for (uint64_t i = 0; i < 512; i++) {
-        pml1[i] = (0x7000000 + i * 0x1000) | PTE_P | PTE_W;  // 128M = 0x8000000
+    for (uint64_t i = 0; i < 100; i++) {
+        pml1[i] = (0x7e00000 + i * 0x1000) | PTE_P | PTE_W;
     }
     __asm__ volatile("mov %0, %%cr3" : : "a"(pml4));
+
     mem_init2();
 }
 
@@ -92,6 +91,9 @@ uint64_t get_physaddr(void *virt) {
 }
 
 void map_page(void *phys, void *virt, unsigned int flags) {
+    paging_indexer_t page_index;
+    paging_indexer_assign(&page_index, virt);
+    
     return;
 }
 
@@ -103,4 +105,35 @@ uint64_t get_phys_mem_load() {
     uint64_t cr3 = 0;
     __asm__ volatile("mov %%cr3, %0" : "=r" (cr3));
     return cr3;
+}
+
+void set_bitmap(uint64_t addr) {
+    if (addr >= 0x7e00000) {
+        return ;
+    }
+    uint64_t tmp = addr / 0x1000;
+    uint64_t index = tmp / 8;
+    uint64_t pos = tmp % 8;
+    mem_bitmap[index] |= (1 << pos);
+}
+
+void set_unbitmap(uint64_t addr) {
+    if (addr >= 0x7e00000) {
+        return ;
+    }
+    uint64_t tmp = addr / 0x1000;
+    uint64_t index = tmp / 8;
+    uint64_t pos = tmp % 8;
+    uint8_t bit = 0xFF;
+    mem_bitmap[index] &= ((0 << pos) & bit);
+}
+
+uint64_t get_bitmap(uint64_t addr) {
+    if (addr >= 0x7e00000) {
+        return 1;
+    }
+    uint64_t tmp = addr / 0x1000;
+    uint64_t index = tmp / 8;
+    uint64_t pos = tmp % 8;
+    return ((1 << pos) && mem_bitmap[index]);
 }

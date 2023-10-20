@@ -37,5 +37,5 @@ Label_Get_Mem_Fail:
 %include "boot/boot_gdt.asm"
 %include "boot/boot_long.asm"
 
-MSG_BOOT_START db "Boot Start", 0
+MSG_BOOT_START db "Boot Start ", 0
 MSG_MEM_ERROR db "Boot GET MEM ERROR", 0

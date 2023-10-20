@@ -2,8 +2,8 @@
 #include <stdint.h>
 
 /**
- * 0 ---- 9fc00 ---- 7e00000 ---- 7ee0000
- *                            pt
+ * 0 ---- 9fc00 ---- 7e00000 ---- 7ede000 ---- 7edf000
+ *                            pt         bitmap
 */
 
 /**
@@ -49,3 +49,9 @@ void map_page(void *physaddr, void *virtualaddr, unsigned int flags);
 void unmap_page(void *phys, void *virt, unsigned int flags);
 
 uint64_t get_phys_mem_load();
+
+void set_bitmap(uint64_t addr);
+
+void set_unbitmap(uint64_t addr);
+
+uint64_t get_bitmap(uint64_t addr);

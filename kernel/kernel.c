@@ -8,8 +8,9 @@
 void kernel_main() {
 
     uart_init();
-    
-    printk("\n\nLoad Kernel ... \n\n");
+
+    printk("\n\nStart in 64-bit Long Mode ... \n");
+    printk("\nLoad Kernel ... \n\n");
 
     gdt_init();
 
@@ -17,7 +18,7 @@ void kernel_main() {
 
     mem_init();
 
-    printk("\n\nEnter FastOS\n\n");
+    printk("\nEnter FastOS\n");
 
     // get_apic_base();
 
